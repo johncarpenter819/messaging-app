@@ -1,0 +1,132 @@
+:root {
+  --sidebar-w: 240px;
+  --header-h: 64px;
+  --accent: #2e3b4e;
+  --muted: #888;
+  --bg: #fafafa;
+}
+.chats-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: #222;
+}
+.chats-header {
+  height: var(--header-h);
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ddd;
+  display: inline-block;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+.username {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1;
+  font-size: 1rem;
+}
+.status {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.status.offline {
+  color: red;
+}
+.logout-btn {
+  background: linear-gradient(135deg, #6a11cb, #2575dc);
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.logout-btn:hover {
+  background: #2575fc;
+}
+.chats-body {
+  display: flex;
+  flex: 1 1 0;
+  height: calc(100vh - var(--header-h));
+  overflow: hidden;
+}
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  max-width: var(--sidebar-w);
+  background: #fff;
+  border-right: 1px solid #e6e6e6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #f1f1f1;
+}
+.tabs button {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 6px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted);
+}
+.tabs button.active {
+  color: var(--accent);
+  border-bottom: 3px solid var(--accent);
+}
+.list {
+  flex: 1;
+  overflow-y: hidden;
+  padding: 8px 6px;
+  background: #fff;
+}
+.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.list li:hover {
+  background: #f7f7f7;
+}
+.list li .preview-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.list li .preview-sub {
+  font-size: 0.82rem;
+  color: #888;
+}

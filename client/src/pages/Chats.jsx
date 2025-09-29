@@ -8,7 +8,7 @@ export default function Chats() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
-  const [activeTab, setActiveTag] = useState("conversations");
+  const [activeTab, setActiveTab] = useState("conversations");
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
 
@@ -18,6 +18,7 @@ export default function Chats() {
     const getMessages = async () => {
       try {
         const data = await fetchMessages(userId, token);
+        console.log("Fetched messages", data);
         setMessages(data);
       } catch (err) {
         setError("Failed to load messages");
@@ -41,19 +42,58 @@ export default function Chats() {
   };
 
   return (
-    <ChatWindow>
-      {messages.map((msg) => (
-        <MessageBubble key={msg.id} message={msg} />
-      ))}
-      {error && <p className="error">{error}</p>}
-      <form className="chat-form" onSubmit={handleSend}>
-        <input
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+    <div className="chats-page">
+      <header className="chats-header">
+        <div className="user-info">
+          <img src="./default-avatar.png" alt="avatar" className="avatar" />
+          <div>
+            <p className="username">John Doe</p>
+            <p className="status online">Online</p>
+          </div>
+        </div>
+        <button className="logout-btn">Logout</button>
+      </header>
+
+      <div className="chats-body">
+        <aside className="sidebar">
+          <div className="tabs">
+            <button
+              className={activeTab === "conversations" ? "active" : ""}
+              onClick={() => setActiveTab("conversations")}
+            >
+              Chats
+            </button>
+            <button
+              className={activeTab === "contacts" ? "active" : ""}
+              onClick={() => setActiveTab("contacts")}
+            >
+              Contacts
+            </button>
+          </div>
+
+          <div className="list">
+            {activeTab === "conversations" ? (
+              <ul>
+                <li>Alice</li>
+                <li>Bob</li>
+                <li>Charlie</li>
+              </ul>
+            ) : (
+              <ul>
+                <li>User1</li>
+                <li>User2</li>
+                <li>User3</li>
+              </ul>
+            )}
+          </div>
+        </aside>
+        <ChatWindow
+          messages={messages}
+          input={input}
+          setInput={setInput}
+          onSend={handleSend}
         />
-        <button type="submit">Send</button>
-      </form>
-    </ChatWindow>
+      </div>
+    </div>
   );
 }
