@@ -1,23 +1,66 @@
 import { useState, useEffect } from "react";
-import { fetchMessages, sendMessage } from "../api/api";
+import { useNavigate } from "react-router-dom";
+import {
+  fetchMessages,
+  sendMessage,
+  fetchConversations,
+  fetchContacts,
+} from "../api/api";
 import ChatWindow from "../components/ChatWindow";
-import MessageBubble from "../components/MessageBubble";
+// import MessageBubble from "../components/MessageBubble";
+import ContactProfileModal from "../components/ContactProfileModal";
 import "../styles/Chats.css";
 
 export default function Chats() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("conversations");
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [otherUserId, setOtherUserId] = useState(null);
+  const [conversations, setConversations] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [otherUserName, setOtherUserName] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
+
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
+  const username = localStorage.getItem("username");
 
   useEffect(() => {
-    if (!token || !userId) return;
+    if (!token) return;
+
+    const getConversations = async () => {
+      try {
+        const data = await fetchConversations(token);
+        setConversations(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const getContacts = async () => {
+      try {
+        const data = await fetchContacts(token);
+        setContacts(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getConversations();
+    getContacts();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || !activeConversationId) return;
 
     const getMessages = async () => {
       try {
-        const data = await fetchMessages(userId, token);
+        const data = await fetchMessages(activeConversationId, token);
         console.log("Fetched messages", data);
         setMessages(data);
       } catch (err) {
@@ -26,19 +69,75 @@ export default function Chats() {
     };
 
     getMessages();
-  }, [token, userId]);
+  }, [token, activeConversationId]);
+
+  const handleSelectConversation = (conv) => {
+    setActiveConversationId(conv.id);
+
+    setOtherUserName(conv.name || `Conversation ${conv.id}`);
+
+    const currentUserIdStr = String(userId);
+    const participant1IdStr = String(conv.participant1_id);
+    const participant2IdStr = String(conv.participant2_id);
+
+    if (participant1IdStr === currentUserIdStr) {
+      setOtherUserId(participant2IdStr);
+    } else {
+      setOtherUserId(participant1IdStr);
+    }
+  };
+
+  const handleStartConversation = (contact) => {
+    setIsModalOpen(false);
+    setActiveConversationId(null);
+    setOtherUserId(contact.id);
+    setOtherUserName(contact.username);
+    setActiveTab("conversations");
+    setMessages([]);
+  };
+
+  const handleContactClick = (contact) => {
+    setSelectedContact(contact);
+    setIsModalOpen(true);
+  };
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     try {
-      const newMessage = await sendMessage({ userId, content: input }, token);
+      const newMessage = await sendMessage(
+        {
+          conversation_id: activeConversationId,
+          sender_id: userId,
+          receiver_id: otherUserId,
+          content: input,
+        },
+        token
+      );
+
+      if (newMessage && newMessage.error) {
+        setError(`Error: ${newMessage.error}`);
+        return;
+      }
+
+      if (newMessage.conversation_id && !activeConversationId) {
+        setActiveConversationId(newMessage.conversation_id);
+      }
+
       setMessages([...messages, newMessage]);
       setInput("");
     } catch (err) {
+      console.error(err);
       setError("Failed to send message");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
+    window.location.href = "/login";
   };
 
   return (
@@ -47,11 +146,13 @@ export default function Chats() {
         <div className="user-info">
           <img src="./default-avatar.png" alt="avatar" className="avatar" />
           <div>
-            <p className="username">John Doe</p>
+            <p className="username">{username}</p>
             <p className="status online">Online</p>
           </div>
         </div>
-        <button className="logout-btn">Logout</button>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </header>
 
       <div className="chats-body">
@@ -73,17 +174,35 @@ export default function Chats() {
 
           <div className="list">
             {activeTab === "conversations" ? (
+              Array.isArray(conversations) && conversations.length > 0 ? (
+                <ul>
+                  {conversations.map((conv) => (
+                    <li
+                      key={conv.id}
+                      onClick={() => handleSelectConversation(conv)}
+                    >
+                      {conv.name || `Conversation ${conv.id}`}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="list-status">No active chats found.</p>
+              )
+            ) : Array.isArray(contacts) && contacts.length > 0 ? (
               <ul>
-                <li>Alice</li>
-                <li>Bob</li>
-                <li>Charlie</li>
+                {contacts.map((contact) => (
+                  <li
+                    key={contact.id}
+                    onClick={() => {
+                      handleContactClick(contact);
+                    }}
+                  >
+                    {contact.username}
+                  </li>
+                ))}
               </ul>
             ) : (
-              <ul>
-                <li>User1</li>
-                <li>User2</li>
-                <li>User3</li>
-              </ul>
+              <p className="list-status">No contacts found.</p>
             )}
           </div>
         </aside>
@@ -92,8 +211,19 @@ export default function Chats() {
           input={input}
           setInput={setInput}
           onSend={handleSend}
+          otherUserId={otherUserId}
+          userId={userId}
+          otherUserName={otherUserName}
         />
       </div>
+      {isModalOpen && selectedContact && (
+        <ContactProfileModal
+          contact={selectedContact}
+          onClose={() => setIsModalOpen(false)}
+          onMessage={() => handleStartConversation(selectedContact)}
+          onVisitProfile={() => navigate(`/profile/${selectedContact.id}`)}
+        />
+      )}
     </div>
   );
 }

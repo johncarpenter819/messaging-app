@@ -24,6 +24,8 @@ export default function Login() {
     if (res.error) setError(res.error);
     else {
       localStorage.setItem("token", res.token);
+      localStorage.setItem("userId", res.user.id);
+      localStorage.setItem("username", res.user.username);
       navigate("/chats");
     }
   };

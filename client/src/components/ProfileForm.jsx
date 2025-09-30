@@ -1,9 +1,13 @@
 import "../styles/ProfileForm.css";
 
-export default function ProfileForm() {
+export default function ProfileForm({ otherUserName }) {
+  const title = otherUserName
+    ? `Chatting with ${otherUserName}`
+    : "Select a Chat";
+
   return (
     <div className="profile-form">
-      <h1>Your Profile</h1>
+      <h1>{title}</h1>
     </div>
   );
 }

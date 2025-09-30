@@ -2,24 +2,45 @@ import MessageBubble from "./MessageBubble";
 import ProfileForm from "./ProfileForm";
 import "../styles/ChatWindow.css";
 
-export default function ChatWindow({ messages, input, setInput, onSend }) {
-  const testMessages = [
-    { id: 1, text: "Hello there", sender: "other" },
-    { id: 2, text: "General Kenobi", sender: "me" },
-    { id: 3, text: "SW reference", sender: "other" },
-  ];
+export default function ChatWindow({
+  messages,
+  input,
+  setInput,
+  onSend,
+  otherUserId,
+  userId,
+  otherUserName,
+}) {
+  if (!otherUserId) {
+    return (
+      <div className="chat-window chat-placeholder">
+        <p>Select a chat or contact to begin messaging</p>
+      </div>
+    );
+  }
 
-  const displayMessages = messages.length ? messages : testMessages;
+  const displayMessages = messages;
+  const currentUserId = localStorage.getItem("userId");
 
   return (
     <div className="chat-window">
-      <ProfileForm />
+      <ProfileForm otherUserName={otherUserName} />
       <div className="messages">
+        {displayMessages.length === 0 && (
+          <div className="empty-chat-prompt">
+            <p>Start a conversation! Type your first message below.</p>
+          </div>
+        )}
+
         {displayMessages.map((msg, i) => {
-          const text = msg.text || msg.message || msg;
-          const sender = msg.sender || msg.from || "other";
+          const text = msg.content || msg.message || msg.text || msg;
+          const bubbleSender = msg.sender_id === currentUserId ? "me" : "other";
           return (
-            <MessageBubble key={msg.id || i} message={text} sender={sender} />
+            <MessageBubble
+              key={msg.id || i}
+              message={text}
+              sender={bubbleSender}
+            />
           );
         })}
       </div>
