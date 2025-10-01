@@ -55,7 +55,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.json({ token, user: { id: user.id, username: user.username } });
+    res.json({ token, userId: user.id, username: user.username });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Database error" });

@@ -2,12 +2,15 @@ import { useState } from "react";
 import { loginUser } from "../api/api";
 import "../styles/Auth.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  const { login } = useAuth();
 
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -17,16 +20,15 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    const userData = await loginUser(form);
 
-    const { email, password } = form;
-    const res = await loginUser({ email, password });
-    if (res.error) setError(res.error);
-    else {
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("userId", res.user.id);
-      localStorage.setItem("username", res.user.username);
+    if (userData.token) {
+      login(userData);
       navigate("/chats");
+    } else {
+      setError(
+        userData.message || "Login failed. Please check your credentials."
+      );
     }
   };
 

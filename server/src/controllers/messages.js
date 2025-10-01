@@ -24,11 +24,21 @@ export const getMessagesByConversation = async (req, res) => {
 export const createMessage = async (req, res) => {
   let { conversation_id, sender_id, receiver_id, content } = req.body;
 
-  if (!sender_id || !receiver_id || !content) {
+  if (
+    !sender_id ||
+    !receiver_id ||
+    !content ||
+    typeof sender_id !== "string" ||
+    typeof receiver_id !== "string"
+  ) {
     return res.status(400).json({
       error:
         " conversation_id, sender_id, receiver_id, and content are required",
     });
+  }
+
+  if (conversation_id === undefined || conversation_id === "") {
+    conversation_id = null;
   }
 
   try {

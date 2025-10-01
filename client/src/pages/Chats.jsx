@@ -10,9 +10,11 @@ import ChatWindow from "../components/ChatWindow";
 // import MessageBubble from "../components/MessageBubble";
 import ContactProfileModal from "../components/ContactProfileModal";
 import "../styles/Chats.css";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Chats() {
   const navigate = useNavigate();
+  const { token, userId, username, logout, isLoggedIn } = useAuth();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
@@ -26,13 +28,11 @@ export default function Chats() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
 
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
-  const username = localStorage.getItem("username");
-
   useEffect(() => {
-    if (!token) return;
-
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
     const getConversations = async () => {
       try {
         const data = await fetchConversations(token);
@@ -53,7 +53,7 @@ export default function Chats() {
 
     getConversations();
     getContacts();
-  }, [token]);
+  }, [token, isLoggedIn, navigate]);
 
   useEffect(() => {
     if (!token || !activeConversationId) return;
@@ -105,6 +105,16 @@ export default function Chats() {
     e.preventDefault();
     if (!input.trim()) return;
 
+    if (!otherUserId) {
+      setError("Please select a chat or contact to send a message.");
+      return;
+    }
+
+    if (!userId || String(userId).toLowerCase() === "undefined") {
+      setError("Error: sender id not found please log out and back in.");
+      return;
+    }
+
     try {
       const newMessage = await sendMessage(
         {
@@ -134,10 +144,8 @@ export default function Chats() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
-    window.location.href = "/login";
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -154,6 +162,11 @@ export default function Chats() {
           Logout
         </button>
       </header>
+      {error && (
+        <div className="app-error-message">
+          <p>{error}</p>
+        </div>
+      )}
 
       <div className="chats-body">
         <aside className="sidebar">
