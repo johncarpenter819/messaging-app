@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 .auth-wrapper {
   display: flex;
@@ -80,4 +81,31 @@
 }
 .auth-footer a:hover {
   font-size: 1.1rem;
+}
+
+@media (max-width: 450px) {
+  .auth-wrapper {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+  .auth-container {
+    max-width: 100%;
+    padding: 1.5rem 1rem;
+    margin-top: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  .auth-container:hover {
+    transform: none;
+  }
+  .auth-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .auth-container input,
+  .auth-container button {
+    width: 100%;
+  }
+  .auth-footer a:hover {
+    font-size: 0.9rem;
+  }
 }
