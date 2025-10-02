@@ -11,6 +11,9 @@ export default function ContactProfileModal({
 
   const avatar = contact.avatar_url || "./default-avatar.png";
 
+  const effectiveStatus = contact.status || "Offline";
+  const statusClass = effectiveStatus.toLowerCase();
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -31,8 +34,8 @@ export default function ContactProfileModal({
         </div>
 
         <div className="profile-details">
-          <p>
-            <strong>Status:</strong> {contact.status || "Offline"}
+          <p className={`status-line ${statusClass}`}>
+            <strong>Status:</strong> {effectiveStatus}
           </p>
         </div>
 

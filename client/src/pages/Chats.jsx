@@ -5,6 +5,7 @@ import {
   sendMessage,
   fetchConversations,
   fetchContacts,
+  fetchUserDetails,
 } from "../api/api";
 import ChatWindow from "../components/ChatWindow";
 // import MessageBubble from "../components/MessageBubble";
@@ -24,6 +25,7 @@ export default function Chats() {
   const [conversations, setConversations] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [otherUserName, setOtherUserName] = useState(null);
+  const [userAvatarUrl, setUserAvatarUrl] = useState("./default-avatar.png");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -33,6 +35,19 @@ export default function Chats() {
       navigate("/login");
       return;
     }
+
+    const getCurrentUserDetails = async () => {
+      if (!userId || !token) return;
+      try {
+        const data = await fetchUserDetails(userId, token);
+        if (data.avatar_url) {
+          setUserAvatarUrl(data.avatar_url);
+        }
+      } catch (err) {
+        console.error("Failed to load current user avatar:", err);
+      }
+    };
+
     const getConversations = async () => {
       try {
         const data = await fetchConversations(token);
@@ -51,9 +66,10 @@ export default function Chats() {
       }
     };
 
+    getCurrentUserDetails();
     getConversations();
     getContacts();
-  }, [token, isLoggedIn, navigate]);
+  }, [token, isLoggedIn, navigate, userId]);
 
   useEffect(() => {
     if (!token || !activeConversationId) return;
@@ -96,9 +112,17 @@ export default function Chats() {
     setMessages([]);
   };
 
-  const handleContactClick = (contact) => {
-    setSelectedContact(contact);
-    setIsModalOpen(true);
+  const handleContactClick = async (contact) => {
+    try {
+      const fullContactData = await fetchUserDetails(contact.id, token);
+      setSelectedContact(fullContactData);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch contact details for modal:", error);
+      setSelectedContact(contact);
+      setIsModalOpen(true);
+      setError("Could not load latest contact details.");
+    }
   };
 
   const handleSend = async (e) => {
@@ -151,8 +175,11 @@ export default function Chats() {
   return (
     <div className="chats-page">
       <header className="chats-header">
-        <div className="user-info">
-          <img src="./default-avatar.png" alt="avatar" className="avatar" />
+        <div
+          className="user-info user-info-link"
+          onClick={() => navigate("/profile")}
+        >
+          <img src={userAvatarUrl} alt="avatar" className="avatar" />
           <div>
             <p className="username">{username}</p>
             <p className="status online">Online</p>

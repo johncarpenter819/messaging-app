@@ -7,6 +7,7 @@ import authRoutes from "./src/routes/auth.js";
 import messagesRoute from "./src/routes/messages.js";
 import conversationsRoute from "./src/routes/conversations.js";
 import contactsRoute from "./src/routes/contacts.js";
+import usersRoutes from "./src/routes/users.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messagesRoute);
 app.use("/api/conversations", conversationsRoute);
 app.use("/api/contacts", contactsRoute);
+app.use("/api/users", usersRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

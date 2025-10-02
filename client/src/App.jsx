@@ -3,7 +3,7 @@ import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
 import Chats from "./pages/Chats.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
-// import Profile from "./pages/Profile.jsx";
+import Profile from "./pages/Profile.jsx";
 
 function App() {
   return (
@@ -13,7 +13,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chats" element={<Chats />} />
-          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:userId" element={<Profile />} />
         </Routes>
       </AuthProvider>
     </Router>

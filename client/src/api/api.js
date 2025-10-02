@@ -59,3 +59,30 @@ export const fetchContacts = async (token) => {
   }
   return res.json();
 };
+
+export const fetchUserDetails = async (userId, token) => {
+  const res = await fetch(`${API_URL}/api/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw new Error(errorBody.error || `HTTP error! Status: ${res.status}`);
+  }
+  return res.json();
+};
+
+export const updateProfile = async (userId, updatedData, token) => {
+  const res = await fetch(`${API_URL}/api/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(updatedData),
+  });
+  if (!res.ok) {
+    const errorBody = await res.json();
+    throw new Error(errorBody.error || `HTTP error! Status: ${res.status}`);
+  }
+  return res.json();
+};

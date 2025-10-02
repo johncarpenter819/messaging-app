@@ -30,6 +30,14 @@
   align-items: center;
   gap: 12px;
 }
+.user-info-link {
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.user-info-link:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
 .avatar {
   width: 44px;
   height: 44px;
