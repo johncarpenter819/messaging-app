@@ -138,3 +138,16 @@
   font-size: 0.82rem;
   color: #888;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    border-right: none;
+  }
+  .chats-body {
+    width: 100%;
+    display: flex;
+  }
+}
