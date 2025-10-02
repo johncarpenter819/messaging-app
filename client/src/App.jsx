@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
 import Chats from "./pages/Chats.jsx";
@@ -10,6 +15,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chats" element={<Chats />} />
